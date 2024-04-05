@@ -192,12 +192,12 @@ def process(
     yield "### \n 💊 Loading face analyser model...", *ui_before()
     load_face_analyser_model()
 
-    yield "### \n 💊 Loading face swapper model...", *ui_before()
+    yield "### \n 👑 Loading face swapper model...", *ui_before()
     load_face_swapper_model()
 
     if face_enhancer_name != "NONE":
         if face_enhancer_name not in cv2_interpolations:
-            yield f"### \n 🪜 Loading {face_enhancer_name} model...", *ui_before()
+            yield f"### \n 🔮 Loading {face_enhancer_name} model...", *ui_before()
         FACE_ENHANCER = load_face_enhancer_model(name=face_enhancer_name, device=device)
     else:
         FACE_ENHANCER = None
@@ -544,7 +544,7 @@ footer{display:none !important}
 
 with gr.Blocks(css=css) as interface:
     gr.Markdown("# 🧸 Deepfake Faceswap")
-    gr.Markdown("### Face swap app based on insightface inswapper.")
+    gr.Markdown("### 📥 insightface inswapper bypass NSFW.")
     with gr.Row():
         with gr.Row():
             with gr.Column(scale=0.4):
@@ -561,7 +561,7 @@ with gr.Blocks(css=css) as interface:
                         value=25, label="Value", interactive=True, visible=False
                     )
 
-                with gr.Tab("🧫 Detection Settings"):
+                with gr.Tab("🎛️ Detection Settings"):
                     detect_condition_dropdown = gr.Dropdown(
                         detect_conditions,
                         label="Condition",
@@ -592,7 +592,7 @@ with gr.Blocks(css=css) as interface:
                         label="Keep output sequence", value=False, interactive=True
                     )
 
-                with gr.Tab("☢️ Other Settings"):
+                with gr.Tab("💎 Other Settings"):
                     face_scale = gr.Slider(
                         label="Face Scale",
                         minimum=0,
