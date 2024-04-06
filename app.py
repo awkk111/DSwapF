@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from assets import core
+from main import run
 
 if __name__ == '__main__':
-    core.run()
+    run.run()
