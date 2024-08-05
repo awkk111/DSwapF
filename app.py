@@ -542,7 +542,7 @@ css = """
 footer{display:none !important}
 """
 
-with gr.Blocks(css=css) as interface:
+with gr.Blocks(theme='gradio_theme_darkmode_grey_red') as interface:
     gr.Markdown("# 🧸 Deepfake Faceswap")
     gr.Markdown("### 📥 insightface inswapper bypass NSFW.")
     with gr.Row():
