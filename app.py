@@ -26,7 +26,7 @@ from utils import trim_video, StreamerThread, ProcessBar, open_directory, split_
 
 ## ------------------------------ USER ARGS ------------------------------
 
-parser = argparse.ArgumentParser(description="Swap-Mukham Face Swapper")
+parser = argparse.ArgumentParser(description="Free Face Swapper")
 parser.add_argument("--out_dir", help="Default Output directory", default=os.getcwd())
 parser.add_argument("--batch_size", help="Gpu batch size", default=32)
 parser.add_argument("--cuda", action="store_true", help="Enable cuda", default=False)
@@ -189,21 +189,21 @@ def process(
 
     
 
-    yield "### \n 💊 Loading face analyser model...", *ui_before()
+    yield "### \n 🌀 Loading face analyser model...", *ui_before()
     load_face_analyser_model()
 
-    yield "### \n 👑 Loading face swapper model...", *ui_before()
+    yield "### \n ⚙️ Loading face swapper model...", *ui_before()
     load_face_swapper_model()
 
     if face_enhancer_name != "NONE":
         if face_enhancer_name not in cv2_interpolations:
-            yield f"### \n 🔮 Loading {face_enhancer_name} model...", *ui_before()
+            yield f"### \n 💡 Loading {face_enhancer_name} model...", *ui_before()
         FACE_ENHANCER = load_face_enhancer_model(name=face_enhancer_name, device=device)
     else:
         FACE_ENHANCER = None
 
     if enable_face_parser:
-        yield "### \n 🧲 Loading face parsing model...", *ui_before()
+        yield "### \n 📀 Loading face parsing model...", *ui_before()
         load_face_parser_model()
 
     includes = mask_regions_to_list(mask_includes)
@@ -221,7 +221,7 @@ def process(
         ## ------------------------------ CONTENT CHECK ------------------------------
 
     
-        yield "### \n 📡 Analysing face data...", *ui_before()
+        yield "### \n 🧿 Analysing face data...", *ui_before()
         if condition != "Specific Face":
             source_data = source_path, age
         else:
@@ -237,7 +237,7 @@ def process(
 
         ## ------------------------------ SWAP FUNC ------------------------------
 
-        yield "### \n ⚙️ Generating faces...", *ui_before()
+        yield "### \n 🧶 Generating faces...", *ui_before()
         preds = []
         matrs = []
         count = 0
@@ -251,13 +251,13 @@ def process(
             if USE_CUDA:
                 image_grid = create_image_grid(batch_pred, size=128)
                 PREVIEW = image_grid[:, :, ::-1]
-                yield f"### \n ⚙️ Generating face Batch {count}", *ui_before()
+                yield f"### \n 🧩 Generating face Batch {count}", *ui_before()
 
         ## ------------------------------ FACE ENHANCEMENT ------------------------------
 
         generated_len = len(preds)
         if face_enhancer_name != "NONE":
-            yield f"### \n 📐 Upscaling faces with {face_enhancer_name}...", *ui_before()
+            yield f"### \n 🎲 Upscaling faces with {face_enhancer_name}...", *ui_before()
             for idx, pred in tqdm(enumerate(preds), total=generated_len, desc=f"Upscaling with {face_enhancer_name}"):
                 enhancer_model, enhancer_model_runner = FACE_ENHANCER
                 pred = enhancer_model_runner(pred, enhancer_model)
@@ -267,7 +267,7 @@ def process(
         ## ------------------------------ FACE PARSING ------------------------------
 
         if enable_face_parser:
-            yield "### \n 🖇️ Face-parsing mask...", *ui_before()
+            yield "### \n 🎨 Face-parsing mask...", *ui_before()
             masks = []
             count = 0
             for batch_mask in get_parsed_mask(FACE_PARSER, preds, classes=includes, device=device, batch_size=BATCH_SIZE, softness=int(mask_soft_iterations)):
@@ -278,7 +278,7 @@ def process(
                 if len(batch_mask) > 1:
                     image_grid = create_image_grid(batch_mask, size=128)
                     PREVIEW = image_grid[:, :, ::-1]
-                    yield f"### \n ✏️ Face parsing Batch {count}", *ui_before()
+                    yield f"### \n 🪙 Face parsing Batch {count}", *ui_before()
             masks = np.concatenate(masks, axis=0) if len(masks) >= 1 else masks
         else:
             masks = [None] * generated_len
@@ -294,7 +294,7 @@ def process(
 
         ## ------------------------------ PASTE-BACK ------------------------------
 
-        yield "### \n 🛠️ Pasting back...", *ui_before()
+        yield "### \n 🧿 Pasting back...", *ui_before()
         def post_process(frame_idx, frame_img, split_preds, split_matrs, split_masks, enable_laplacian_blend, crop_mask, blur_amount, erode_amount):
             whole_img_path = frame_img
             whole_img = cv2.imread(whole_img_path)
@@ -350,7 +350,7 @@ def process(
         temp_path = os.path.join(output_path, output_name, "sequence")
         os.makedirs(temp_path, exist_ok=True)
 
-        yield "### \n 💽 Extracting video frames...", *ui_before()
+        yield "### \n ⌛ Extracting video frames...", *ui_before()
         image_sequence = []
         cap = cv2.VideoCapture(video_path)
         curr_idx = 0
@@ -367,12 +367,12 @@ def process(
         for info_update in swap_process(image_sequence):
             yield info_update
 
-        yield "### \n 🔗 Merging sequence...", *ui_before()
+        yield "### \n ⌛ Merging sequence...", *ui_before()
         output_video_path = os.path.join(output_path, output_name + ".mp4")
         merge_img_sequence_from_ref(video_path, image_sequence, output_video_path)
 
         if os.path.exists(temp_path) and not keep_output_sequence:
-            yield "### \n 🚽 Removing temporary files...", *ui_before()
+            yield "### \n ⌛ Removing temporary files...", *ui_before()
             shutil.rmtree(temp_path)
 
         WORKSPACE = output_path
@@ -490,7 +490,7 @@ def video_changed(video_path):
 
 
 def analyse_settings_changed(detect_condition, detection_size, detection_threshold):
-    yield "### \n 💡 Applying new values..."
+    yield "### \n ⌛ Applying new values..."
     global FACE_ANALYSER
     global DETECT_CONDITION
     DETECT_CONDITION = detect_condition
@@ -526,14 +526,14 @@ def slider_changed(show_frame, video_path, frame_index):
 
 
 def trim_and_reload(video_path, output_path, output_name, start_frame, stop_frame):
-    yield video_path, f"### \n 🛠️ Trimming video frame {start_frame} to {stop_frame}..."
+    yield video_path, f"### \n 🌈 Trimming video frame {start_frame} to {stop_frame}..."
     try:
         output_path = os.path.join(output_path, output_name)
         trimmed_video = trim_video(video_path, output_path, start_frame, stop_frame)
         yield trimmed_video, "### \n ✔️ Video trimmed and reloaded."
     except Exception as e:
         print(e)
-        yield video_path, "### \n ❌ Video trimming failed. See console for more info."
+        yield video_path, "### \n 🔥 Video trimming failed. See console for more info."
 
 
 ## ------------------------------ GRADIO GUI ------------------------------
@@ -542,13 +542,12 @@ css = """
 footer{display:none !important}
 """
 
-with gr.Blocks(theme='gradio_theme_darkmode_grey_red') as interface:
-    gr.Markdown("# 🧸 Deepfake Faceswap")
-    gr.Markdown("### 📥 insightface inswapper bypass NSFW.")
+with gr.Blocks(css=css) as interface:
+    gr.Markdown("# 🦋 FaceSwap with Enhnacer 🦋")
     with gr.Row():
         with gr.Row():
             with gr.Column(scale=0.4):
-                with gr.Tab("⚖️ Swap Condition"):
+                with gr.Tab("💗 Swap Condition"):
                     swap_option = gr.Dropdown(
                         swap_options_list,
                         info="Choose which face or faces in the target image to swap.",
@@ -561,7 +560,7 @@ with gr.Blocks(theme='gradio_theme_darkmode_grey_red') as interface:
                         value=25, label="Value", interactive=True, visible=False
                     )
 
-                with gr.Tab("🎛️ Detection Settings"):
+                with gr.Tab("❤️‍🩹 Detection Settings"):
                     detect_condition_dropdown = gr.Dropdown(
                         detect_conditions,
                         label="Condition",
@@ -579,7 +578,7 @@ with gr.Blocks(theme='gradio_theme_darkmode_grey_red') as interface:
                     )
                     apply_detection_settings = gr.Button("Apply settings")
 
-                with gr.Tab("♻️ Output Settings"):
+                with gr.Tab("💖 Output Settings"):
                     output_directory = gr.Text(
                         label="Output Directory",
                         value=DEF_OUTPUT_PATH,
@@ -592,7 +591,7 @@ with gr.Blocks(theme='gradio_theme_darkmode_grey_red') as interface:
                         label="Keep output sequence", value=False, interactive=True
                     )
 
-                with gr.Tab("💎 Other Settings"):
+                with gr.Tab("🤍 Other Settings"):
                     face_scale = gr.Slider(
                         label="Face Scale",
                         minimum=0,
@@ -671,7 +670,7 @@ with gr.Blocks(theme='gradio_theme_darkmode_grey_red') as interface:
                     label="Source face", type="filepath", interactive=True
                 )
 
-                with gr.Box(visible=False) as specific_face:
+                with gr.Group(visible=False) as specific_face:
                     for i in range(NUM_OF_SRC_SPECIFIC):
                         idx = i + 1
                         code = "\n"
@@ -697,17 +696,17 @@ with gr.Blocks(theme='gradio_theme_darkmode_grey_red') as interface:
                         value="Image",
                     )
 
-                    with gr.Box(visible=True) as input_image_group:
+                    with gr.Group(visible=True) as input_image_group:
                         image_input = gr.Image(
                             label="Target Image", interactive=True, type="filepath"
                         )
 
-                    with gr.Box(visible=False) as input_video_group:
+                    with gr.Group(visible=False) as input_video_group:
                         vid_widget = gr.Video if USE_COLAB else gr.Text
                         video_input = gr.Video(
                             label="Target Video", interactive=True
                         )
-                        with gr.Accordion("🎨 Trim video", open=False):
+                        with gr.Accordion("💙 Trim video", open=False):
                             with gr.Column():
                                 with gr.Row():
                                     set_slider_range_btn = gr.Button(
@@ -747,15 +746,15 @@ with gr.Blocks(theme='gradio_theme_darkmode_grey_red') as interface:
                                 "Trim and Reload", interactive=True
                             )
 
-                    with gr.Box(visible=False) as input_directory_group:
+                    with gr.Group(visible=False) as input_directory_group:
                         direc_input = gr.Text(label="Path", interactive=True)
 
             with gr.Column(scale=0.6):
                 info = gr.Markdown(value="...")
 
                 with gr.Row():
-                    swap_button = gr.Button("🎯 Swap", variant="primary")
-                    cancel_button = gr.Button("❌ Cancel")
+                    swap_button = gr.Button("💖 Swap", variant="primary")
+                    cancel_button = gr.Button("💔 Cancel")
 
                 preview_image = gr.Image(label="Output", interactive=False)
                 preview_video = gr.Video(
@@ -764,29 +763,18 @@ with gr.Blocks(theme='gradio_theme_darkmode_grey_red') as interface:
 
                 with gr.Row():
                     output_directory_button = gr.Button(
-                        "💌", interactive=False, visible=False
+                        "💚", interactive=False, visible=False
                     )
                     output_video_button = gr.Button(
-                        "📽️", interactive=False, visible=False
+                        "💘", interactive=False, visible=False
                     )
 
-                with gr.Box():
+                with gr.Group():
                     with gr.Row():
                         gr.Markdown(
-                            "### [🎭 Sponsor]"
+                            "### [🤗 Welcome to my GitHub 🤗](https://github.com/victorgeel)"
                         )
-                        gr.Markdown(
-                            "### [🖥️ Source code](https://huggingface.co/spaces/victorisgeek/SwapFace2Pon)"
-                        )
-                        gr.Markdown(
-                            "### [ 🧩 Playground](https://huggingface.co/spaces/victorisgeek/SwapFace2Pon)"
-                        )
-                        gr.Markdown(
-                            "### [📸 Run in Colab](https://colab.research.google.com/github/victorgeel/FaceSwapNoNfsw/blob/main/SwapFace.ipynb)"
-                        )
-                        gr.Markdown(
-                            "### [🤗 Modified Version](https://github.com/victorgeel/FaceSwapNoNfsw)"
-                        )
+                        
 
     ## ------------------------------ GRADIO EVENTS ------------------------------
 
@@ -878,7 +866,8 @@ with gr.Blocks(theme='gradio_theme_darkmode_grey_red') as interface:
     swap_event = swap_button.click(
         fn=process, inputs=swap_inputs, outputs=swap_outputs, show_progress=True
     )
-
+    
+    
     cancel_button.click(
         fn=stop_running,
         inputs=None,
@@ -891,6 +880,7 @@ with gr.Blocks(theme='gradio_theme_darkmode_grey_red') as interface:
             end_frame_event,
         ],
         show_progress=True,
+        
     )
     output_directory_button.click(
         lambda: open_directory(path=WORKSPACE), inputs=None, outputs=None
@@ -903,4 +893,5 @@ if __name__ == "__main__":
     if USE_COLAB:
         print("Running in colab mode")
 
-    interface.queue(concurrency_count=2, max_size=20).launch(share=USE_COLAB)
+        
+interface.launch(share=USE_COLAB, max_threads=10)
