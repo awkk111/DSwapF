@@ -126,7 +126,7 @@ load_face_swapper_model()
 def process(
     input_type,
     image_path,
-    video_path,
+    video_path, see
     directory_path,
     source_path,
     output_path,
@@ -543,7 +543,7 @@ footer{display:none !important}
 """
 
 with gr.Blocks(css=css) as interface:
-    gr.Markdown("# 🦋 FaceSwap with Enhnacer 🦋")
+    gr.Markdown("# 🦋FaceSwap with Enhnacer🦋")
     with gr.Row():
         with gr.Row():
             with gr.Column(scale=0.4):
