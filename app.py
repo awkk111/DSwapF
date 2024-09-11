@@ -543,7 +543,7 @@ footer{display:none !important}
 """
 
 with gr.Blocks(css=css) as interface:
-    gr.Markdown("# 🦋FaceSwapper ® Enhnacer🦋")
+    gr.Markdown("## 🦋FaceSwapper ® Enhnacer🦋")
     with gr.Row():
         with gr.Row():
             with gr.Column(scale=0.4):
